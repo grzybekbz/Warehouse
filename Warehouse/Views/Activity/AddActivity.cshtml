@@ -1,0 +1,77 @@
+﻿@model AddActivityViewModel
+
+@{
+    ViewData["Title"] = "Dodaj przyjęcie na magazyn / wydanie z magazynu";
+}
+
+<div asp-validation-summary="All" class="row text-danger"></div>
+<form method="post">
+    <div class="row">
+        <div class="col-5">
+            <div class="form-inline m-3">
+                <label asp-for="ActivityToAdd.Description">Opis</label>
+                <input asp-for="ActivityToAdd.Description" class="form-control ml-5" />
+            </div>
+            <div class="form-inline m-3">
+                <label asp-for="ActivityToAdd.Where">Skąd/dokąd</label>
+                <input asp-for="ActivityToAdd.Where" class="form-control ml-5" />
+            </div>
+            <div class="form-inline m-3">
+                <button asp-action="AddActivity" type="submit" class="btn btn-primary">
+                    Zapisz
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ml-3">
+                    Anuluj
+                </a>
+            </div>
+        </div>
+        <div class="col-7">
+            <div class="form-inline m-3">
+                <label asp-for="ProductID">Wybierz produkt</label>
+                <select asp-for="ProductID" asp-items="@Model.ListOfProducts"
+                        class="custom-select ml-5"></select>
+            </div>
+            <div class="form-inline m-3">
+                <label asp-for="ProductQuantity">Ilość</label>
+                <input asp-for="ProductQuantity" type="number"
+                       class="form-control inputQuantity ml-5" min="0" max="10000" />
+            </div>
+            <div class="form-inline m-3">
+                <button asp-action="AddProductToActivity" type="submit"
+                        class="btn btn-primary">
+                    Dodaj
+                </button>
+            </div>
+
+           @if (Model.ActivityProducts != null && Model.ActivityProducts.Count > 0) {
+                <div class="text-left ml-3 mt-5">
+                    Lista produktów
+                </div>
+                <table class="table table-dark table-bordered table-sm w-75 m-3">
+                    <tr>
+                        <th class="text-left">Nazwa</th>
+                        <th class="text-left">Ilość</th>
+                    </tr>
+                   @for (int i = 0; i < Model.ActivityProducts.Count(); i++) {
+                        <tr>
+                            <td class="text-left text-info w-50">@Model.ActivityProducts[i].Name</td>
+                            <td class="text-left w-25">@Model.ActivityProducts[i].Quantity</td>
+                            <td class="text-center w-25">
+                                <input type="hidden" asp-for="@Model.ActivityProducts[i].ID"
+                                       value="@Model.ActivityProducts[i].ID"/>
+                                <input type="hidden" asp-for="@Model.ActivityProducts[i].Quantity"
+                                       value="@Model.ActivityProducts[i].Quantity"/>
+                                <input type="hidden" asp-for="@Model.ActivityProducts[i].Name"
+                                       value="@Model.ActivityProducts[i].Name"/>
+                                <button asp-route-activityProductId="@i" asp-action="DeleteProductFromActivity"
+                                        type="submit" class="btn btn-danger btn-sm">
+                                    Usuń
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+    </div>
+</form>

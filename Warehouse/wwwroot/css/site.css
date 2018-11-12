@@ -1,0 +1,22 @@
+﻿.dtable {
+    width: 80%;
+    margin: auto;
+    margin-top: 20px;
+}
+
+div {
+    border: #19B5FE 0 solid;
+}
+
+.input-validation-error {
+    border-color: red;
+    background-color: #fee;
+}
+
+.inputQuantity {
+    max-width: 100px;
+}
+
+.selectProduct {
+    min-width: 250px;
+}
