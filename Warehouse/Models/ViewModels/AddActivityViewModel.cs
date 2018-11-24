@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
 namespace Warehouse.Models {
@@ -7,11 +8,15 @@ namespace Warehouse.Models {
 
         public Activity ActivityToAdd { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Nie wybrano produktu")]
         public int ProductID { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Podaj ilość produktów")]
         public int ProductQuantity { get; set; }
 
         public SelectList ListOfProducts { get; set; }
 
+        [EnsureOneElement(ErrorMessage = "Nie dodano produktów")]
         public List<ProductValues> ActivityProducts { get; set; }
     }
 

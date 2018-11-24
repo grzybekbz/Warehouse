@@ -1,28 +1,49 @@
 ﻿@model AddActivityViewModel
 
 @{
-    ViewData["Title"] = "Dodaj przyjęcie na magazyn / wydanie z magazynu";
+    if (Model.ActivityToAdd.Type.Equals("Admission")) {
+        ViewData["Title"] = "Dodaj przyjęcie na magazyn";
+    } else {
+        ViewData["Title"] = "Dodaj Wydanie z magazynu";
+    }
 }
 
 <div asp-validation-summary="All" class="row text-danger"></div>
 <form method="post">
     <div class="row">
         <div class="col-5">
+            <input type="hidden" asp-for="ActivityToAdd.ActivityID" />
+            <input type="hidden" asp-for="ActivityToAdd.Type" />
+            <input type="hidden" asp-for="ActivityToAdd.Date" />
             <div class="form-inline m-3">
                 <label asp-for="ActivityToAdd.Description">Opis</label>
                 <input asp-for="ActivityToAdd.Description" class="form-control ml-5" />
             </div>
             <div class="form-inline m-3">
-                <label asp-for="ActivityToAdd.Where">Skąd/dokąd</label>
+                <label asp-for="ActivityToAdd.Where">
+                @{
+                    if (Model.ActivityToAdd.Type.Equals("Admission")) {
+                        <text>Skąd</text>
+                    } else {
+                        <text>Dokąd</text>
+                    }
+                }
+                </label>
                 <input asp-for="ActivityToAdd.Where" class="form-control ml-5" />
             </div>
             <div class="form-inline m-3">
                 <button asp-action="AddActivity" type="submit" class="btn btn-primary">
                     Zapisz
                 </button>
-                <a asp-action="Index" class="btn btn-secondary ml-3">
-                    Anuluj
-                </a>
+               @if (Model.ActivityToAdd.Type.Equals("Admission")) {
+                    <a asp-action="Admissions" class="btn btn-secondary ml-3">
+                        Anuluj
+                    </a>
+                } else {
+                    <a asp-action="Shipments" class="btn btn-secondary ml-3">
+                        Anuluj
+                    </a>
+                }
             </div>
         </div>
         <div class="col-7">
@@ -58,13 +79,13 @@
                             <td class="text-left w-25">@Model.ActivityProducts[i].Quantity</td>
                             <td class="text-center w-25">
                                 <input type="hidden" asp-for="@Model.ActivityProducts[i].ID"
-                                       value="@Model.ActivityProducts[i].ID"/>
+                                       value="@Model.ActivityProducts[i].ID" />
                                 <input type="hidden" asp-for="@Model.ActivityProducts[i].Quantity"
-                                       value="@Model.ActivityProducts[i].Quantity"/>
+                                       value="@Model.ActivityProducts[i].Quantity" />
                                 <input type="hidden" asp-for="@Model.ActivityProducts[i].Name"
-                                       value="@Model.ActivityProducts[i].Name"/>
-                                <button asp-route-activityProductId="@i" asp-action="DeleteProductFromActivity"
-                                        type="submit" class="btn btn-danger btn-sm">
+                                       value="@Model.ActivityProducts[i].Name" />
+                                <button asp-route-activityProductId="@i" class="btn btn-danger btn-sm"
+                                        asp-action="DeleteProductFromActivity" type="submit">
                                     Usuń
                                 </button>
                             </td>

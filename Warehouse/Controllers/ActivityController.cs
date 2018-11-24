@@ -18,36 +18,35 @@ namespace Warehouse.Controllers {
 
         public ViewResult Index() => View();
 
-        public ViewResult Admissions() {
-
-            ViewBag.ActivityType = "Admission";
-
-            return View("ShowActivities", repository.Activities
-                .Where(p => p.Type.Equals("Admission")));
-        }
-
-        public ViewResult Shipments() {
-
-            ViewBag.ActivityType = "Shipment";
-
-            return View("ShowActivities", repository.Activities
-                .Where(p => p.Type.Equals("Shipment")));
-        }
-
-        public ViewResult AddActivity(string activityType) {
+        public IActionResult ShowActivities(string activityType) {
 
             if (activityType != null &&
-               (activityType.Equals("Admission") ||
-                activityType.Equals("Shipment")))
+               (activityType.Equals("Shipment") || 
+                activityType.Equals("Admission")))
 
-                return View(new AddActivityViewModel() {
+                return View(new ShowAcivitiesViewModel() {
+                        ActivityType = activityType,
+                        Activities = repository.Activities
+                            .Where(p => p.Type.Equals(activityType))
+                });
+            else
+                return RedirectToAction("Index");
+        }
+
+        public IActionResult AddActivity(string activityType) {
+
+            if (activityType != null && 
+               (activityType.Equals("Shipment") || 
+                activityType.Equals("Admission")))
+
+                return View("AddActivity", new AddActivityViewModel() {
                     ListOfProducts = new SelectList(
                         repository.Products, "ProductID", "Name"),
                     ActivityToAdd = new Activity() { Type = activityType },
                     ActivityProducts = new List<ProductValues>()
                 });
             else
-                return View("Index");
+                return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -57,22 +56,10 @@ namespace Warehouse.Controllers {
             activity.ListOfProducts = new SelectList(
                 repository.Products, "ProductID", "Name");
 
-            if (activity.ActivityProducts == null) {
+            ModelState.Remove("ProductQuantity");
+            ModelState.Remove("ProductID");
 
-                ModelState.AddModelError("noproducts", "Nie dodano produktów");
-                return View(activity);
-
-            } else if (activity.ActivityToAdd.Description == null) {
-
-                ModelState.AddModelError("ActivityToAdd.Description", "Podaj opis");
-                return View(activity);
-
-            } else if (activity.ActivityToAdd.Where == null) {
-
-                ModelState.AddModelError("ActivityToAdd.Where", "Podaj miejsce");
-                return View(activity);
-
-            } else {
+            if (ModelState.IsValid) {
 
                 repository.SaveActivity(activity.ActivityToAdd);
                 repository.SaveProductsInActivity(activity.ActivityProducts,
@@ -82,17 +69,18 @@ namespace Warehouse.Controllers {
 
                     TempData["message"] = $"Dodano przyjęcie na magazyn nr " +
                             $"{activity.ActivityToAdd.ActivityID}";
-                    return RedirectToAction("Admissions");
 
-                } else if (activity.ActivityToAdd.Type.Equals("Shipment")) {
+                } else {
 
                     TempData["message"] = $"Dodano wydanie z magazynu nr " +
                             $"{activity.ActivityToAdd.ActivityID}";
-                    return RedirectToAction("Shipments");
-                } else {
-
-                    return View("Index");
                 }
+                return RedirectToAction("ShowActivities",
+                        new { activityType = activity.ActivityToAdd.Type });
+
+            } else {
+
+                return View(activity);
             }
         }
 
@@ -105,27 +93,25 @@ namespace Warehouse.Controllers {
             if (activity.ActivityProducts == null)
                 activity.ActivityProducts = new List<ProductValues>();
 
-            if (activity.ProductID == 0) {
+            ModelState.Remove("ActivityProducts");
+            ModelState.Remove("ActivityToAdd.Where");
+            ModelState.Remove("ActivityToAdd.Description");
 
-                ModelState.AddModelError("noproduct", "Nie wybrano produktu");
-                return View("AddActivity", activity);
-
-            } else if (activity.ProductQuantity == 0) {
-
-                ModelState.AddModelError("ProductQuantity", "Podaj ilość produktów");
-                return View("AddActivity", activity);
-
-            } else {
+            if (ModelState.IsValid) {
 
                 Product prod = repository.Products
                             .Where(p => p.ProductID.Equals(activity.ProductID))
                             .FirstOrDefault();
 
                 activity.ActivityProducts.Add(new ProductValues() {
-                        ID = prod.ProductID,
-                        Name = prod.Name,
-                        Quantity = activity.ProductQuantity
+                    ID = prod.ProductID,
+                    Name = prod.Name,
+                    Quantity = activity.ProductQuantity
                 });
+
+                return View("AddActivity", activity);
+
+            } else {
 
                 return View("AddActivity", activity);
             }

@@ -1,70 +1,71 @@
-﻿@model IEnumerable<Activity>
+﻿@model ShowAcivitiesViewModel
 
 @{
-    if (ViewBag.ActivityType == "Admission") {
+    if (Model.ActivityType == "Admission") {
         ViewData["Title"] = "Przyjęcie na magazyn";
-    } else if (ViewBag.ActivityType == "Shipment") {
+    } else if (Model.ActivityType == "Shipment") {
         ViewData["Title"] = "Wydanie z magazynu";
     }
 }
 
-<table class="table table-striped table-dark table-bordered table-sm dtable" align="center">
-    <tr>
-        <th class="text-right">ID</th>
-        <th class="text-center">Data</th>
-        <th class="text-center" style="width: 30%">Opis</th>
-        <th class="text-center" style="width: 20%">
-        @{
-            if (ViewBag.ActivityType == "Admission") {
-                <text>Skąd</text>
-            } else if (ViewBag.ActivityType == "Shipment") {
-                <text>Dokąd</text>
-            }
-        }
-        </th>
-    </tr>
-    @if (Model.Count() == 0) {
+@{
+    if (!(Model.Activities.Count() == 0)) {
 
-        <text>Brak danych</text>
-
-    } else {
-        foreach (var item in Model) {
+        <table class="table table-striped table-dark table-bordered table-sm dtable" align="center">
             <tr>
-                <td class="text-right">@item.ActivityID</td>
-                <td class="text-center">@item.Date</td>
-                <td class="text-center">
+                <th class="text-right">ID</th>
+                <th class="text-center">Data</th>
+                <th class="text-center" style="width: 30%">Opis</th>
+                <th class="text-center" style="width: 20%">
                 @{
-                    int maxDesc = 40;
-                    if (item.Description.Length > maxDesc) {
-                        @item.Description.Substring(0, maxDesc).Insert(maxDesc, "...")
-                    } else {
-                        @item.Description
+                    if (Model.ActivityType == "Admission") {
+                        <text>Skąd</text>
+                    } else if (Model.ActivityType == "Shipment") {
+                        <text>Dokąd</text>
                     }
                 }
-                </td>
-                <td class="text-center">@item.Where</td>
-                <td class="text-center" style="width: 24%">
-                    <form asp-action="Delete" method="post">
-                        <a asp-action="Show" class="btn btn-sm btn-success"
-                           asp-route-activityId="@item.ActivityID">
-                            Szczegóły
-                        </a>
-                        <a asp-action="Edit" class="btn btn-sm btn-warning"
-                           asp-route-activityId="@item.ActivityID">
-                            Edytuj
-                        </a>
-                        <input type="hidden" name="ActivityID" value="@item.ActivityID" />
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Usuń
-                        </button>
-                    </form>
-                </td>
+                </th>
             </tr>
-        }
+           @foreach (var item in Model.Activities) {
+                <tr>
+                    <td class="text-right">@item.ActivityID</td>
+                    <td class="text-center">@item.Date</td>
+                    <td class="text-center">
+                    @{
+                        int maxDesc = 40;
+                        if (item.Description.Length > maxDesc) {
+                            @item.Description.Substring(0, maxDesc).Insert(maxDesc, "...")
+                        } else {
+                            @item.Description
+                        }
+                    }
+                    </td>
+                    <td class="text-center">@item.Where</td>
+                    <td class="text-center" style="width: 24%">
+                        <form asp-action="Delete" method="post">
+                            <a asp-action="Show" class="btn btn-sm btn-success"
+                               asp-route-activityId="@item.ActivityID">
+                                Szczegóły
+                            </a>
+                            <a asp-action="Edit" class="btn btn-sm btn-warning"
+                               asp-route-activityId="@item.ActivityID">
+                                Edytuj
+                            </a>
+                            <input type="hidden" name="ActivityID" value="@item.ActivityID" />
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Usuń
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+    } else {
+        <text>Brak danych</text>
     }
-</table>
+}
 
 <div class="text-center m-2">
     <a class="btn btn-dark" asp-action="AddActivity" 
-        asp-route-activityType="@ViewBag.ActivityType">Dodaj</a>
+       asp-route-activityType="@Model.ActivityType">Dodaj</a>
 </div>
