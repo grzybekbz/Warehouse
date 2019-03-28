@@ -1,0 +1,29 @@
+﻿@model ActivityDetailsViewModel
+
+@{
+
+    ViewData["Title"] = "Szczególy";
+
+}
+
+    <div class="row">
+        <div class="col-7">
+
+        </div>
+        <div class="col-5">
+            <div class="text-left ml-3 mt-5">
+                Lista produktów
+            </div>
+            <table class="table table-dark table-bordered table-sm w-75 m-3">
+                <tr>
+                    <th class="text-left">Nazwa</th>
+                    <th class="text-left">Ilość</th>
+                </tr>
+               @foreach (var prod in Model.Products) {
+                    <tr>
+                        
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>

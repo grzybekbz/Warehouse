@@ -70,14 +70,4 @@ namespace Warehouse.Models {
             context.SaveChanges();
         }
     }
-
-
-    /*
-        var dbEntry = context.Activities
-            .FirstOrDefault(p => p.ActivityID == activity.ActivityToAdd.ActivityID);
-        if (dbEntry != null) {
-
-            dbEntry.ActivityID = activity.ActivityToAdd.ActivityID;
-        }
-     */
 }

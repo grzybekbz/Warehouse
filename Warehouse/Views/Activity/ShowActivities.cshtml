@@ -42,12 +42,12 @@
                     </td>
                     <td class="text-center">@item.Where</td>
                     <td class="text-center" style="width: 24%">
-                        <form asp-action="Delete" method="post">
-                            <a asp-action="Show" class="btn btn-sm btn-success"
+                        <form asp-action="ActivityDelete" method="post">
+                            <a asp-action="ActivityDetails" class="btn btn-sm btn-success"
                                asp-route-activityId="@item.ActivityID">
                                 Szczegóły
                             </a>
-                            <a asp-action="Edit" class="btn btn-sm btn-warning"
+                            <a asp-action="ActivityEdit" class="btn btn-sm btn-warning"
                                asp-route-activityId="@item.ActivityID">
                                 Edytuj
                             </a>

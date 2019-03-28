@@ -21,12 +21,12 @@ namespace Warehouse.Controllers {
         public IActionResult ShowActivities(string activityType) {
 
             if (activityType != null &&
-               (activityType.Equals("Shipment") || 
+               (activityType.Equals("Shipment") ||
                 activityType.Equals("Admission")))
 
                 return View(new ShowAcivitiesViewModel() {
-                        ActivityType = activityType,
-                        Activities = repository.Activities
+                    ActivityType = activityType,
+                    Activities = repository.Activities
                             .Where(p => p.Type.Equals(activityType))
                 });
             else
@@ -35,8 +35,8 @@ namespace Warehouse.Controllers {
 
         public IActionResult AddActivity(string activityType) {
 
-            if (activityType != null && 
-               (activityType.Equals("Shipment") || 
+            if (activityType != null &&
+               (activityType.Equals("Shipment") ||
                 activityType.Equals("Admission")))
 
                 return View("AddActivity", new AddActivityViewModel() {
@@ -99,7 +99,7 @@ namespace Warehouse.Controllers {
 
             if (ModelState.IsValid) {
 
-                Product prod = repository.Products
+                var prod = repository.Products
                             .Where(p => p.ProductID.Equals(activity.ProductID))
                             .FirstOrDefault();
 
@@ -115,6 +115,23 @@ namespace Warehouse.Controllers {
 
                 return View("AddActivity", activity);
             }
+        }
+
+        [HttpPost]
+        public ViewResult ActivityDetails(int activityId) {
+
+            var activity = repository.Activities
+                .Where(a => a.ActivityID == activityId)
+                .FirstOrDefault();
+
+            var products = repository.ProductLines
+                .Where(p => p.ActivityID == activity.ActivityID)
+                .OrderBy(p => p.ActivityID);
+
+            return View(new ActivityDetailsViewModel() {
+                Activity = activity,
+                Products = products
+            });
         }
 
         [HttpPost]
