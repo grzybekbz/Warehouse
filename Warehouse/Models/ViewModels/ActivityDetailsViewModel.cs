@@ -6,6 +6,12 @@ namespace Warehouse.Models {
 
         public Activity Activity { get; set; }
 
-        public IEnumerable<ProductLine> Products { get; set; }
+        public IEnumerable<ProductAndQuantity> Products { get; set; }
+    }
+
+    public struct ProductAndQuantity {
+
+        public string Product { get; set; }
+        public int Quantity { get; set; }
     }
 }

@@ -36,8 +36,9 @@ namespace Warehouse {
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
 
+            app.UseDeveloperExceptionPage();
             if (env.IsDevelopment()) {
-                app.UseDeveloperExceptionPage();
+                //
             } else {
                 //app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();

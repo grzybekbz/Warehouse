@@ -16,41 +16,27 @@ namespace Warehouse.Controllers {
             repository = repo;
         }
 
-        public ViewResult Index() => View();
+        public ViewResult ShowActivities(string activityType) {
 
-        public IActionResult ShowActivities(string activityType) {
-
-            if (activityType != null &&
-               (activityType.Equals("Shipment") ||
-                activityType.Equals("Admission")))
-
-                return View(new ShowAcivitiesViewModel() {
-                    ActivityType = activityType,
-                    Activities = repository.Activities
-                            .Where(p => p.Type.Equals(activityType))
-                });
-            else
-                return RedirectToAction("Index");
+            return View(new ShowAcivitiesViewModel() {
+                ActivityType = activityType,
+                Activities = repository.Activities
+                        .Where(p => p.Type.Equals(activityType))
+            });
         }
 
-        public IActionResult AddActivity(string activityType) {
+        public ViewResult AddActivity(string activityType) {
 
-            if (activityType != null &&
-               (activityType.Equals("Shipment") ||
-                activityType.Equals("Admission")))
-
-                return View("AddActivity", new AddActivityViewModel() {
-                    ListOfProducts = new SelectList(
-                        repository.Products, "ProductID", "Name"),
-                    ActivityToAdd = new Activity() { Type = activityType },
-                    ActivityProducts = new List<ProductValues>()
-                });
-            else
-                return RedirectToAction("Index");
+            return View("EditActivity", new EditActivityViewModel() {
+                ListOfProducts = new SelectList(
+                    repository.Products, "ProductID", "Name"),
+                ActivityToAdd = new Activity() { Type = activityType },
+                ActivityProducts = new List<ProductValues>()
+            });
         }
 
         [HttpPost]
-        public IActionResult AddActivity(AddActivityViewModel activity) {
+        public IActionResult AddActivity(EditActivityViewModel activity) {
 
             activity.ActivityToAdd.Date = DateTime.Now;
             activity.ListOfProducts = new SelectList(
@@ -80,12 +66,12 @@ namespace Warehouse.Controllers {
 
             } else {
 
-                return View(activity);
+                return View("EditActivity", activity);
             }
         }
 
         [HttpPost]
-        public ViewResult AddProductToActivity(AddActivityViewModel activity) {
+        public ViewResult AddProductToActivity(EditActivityViewModel activity) {
 
             activity.ListOfProducts = new SelectList(
                         repository.Products, "ProductID", "Name");
@@ -108,16 +94,58 @@ namespace Warehouse.Controllers {
                     Name = prod.Name,
                     Quantity = activity.ProductQuantity
                 });
-
-                return View("AddActivity", activity);
-
-            } else {
-
-                return View("AddActivity", activity);
             }
+
+            return View("EditActivity", activity);
         }
 
         [HttpPost]
+        public ViewResult DeleteProductFromActivity(EditActivityViewModel activity,
+                                                    int activityProductId) {
+
+            activity.ListOfProducts = new SelectList(
+                        repository.Products, "ProductID", "Name");
+
+            ModelState.Remove("ActivityToAdd.Where");
+            ModelState.Remove("ActivityToAdd.Description");
+            ModelState.Remove("ProductQuantity");
+
+            activity.ActivityProducts.RemoveAt(activityProductId);
+
+            return View("EditActivity", activity);
+        }
+
+        public ViewResult EditActivity(int activityId) {
+
+            var activityToAdd = repository.Activities
+                                    .Where(a => a.ActivityID == activityId)
+                                    .FirstOrDefault();
+
+            var listOfProducts = new SelectList(
+                                repository.Products, "ProductID", "Name");
+
+            var query = from product in repository.Products
+                        join productLine in repository.ProductLines
+                        on product.ProductID equals productLine.ProductID
+                        where productLine.ActivityID == activityId
+                        select new { id = product.ProductID, n = product.Name, q = productLine.Quantity };
+
+            var activityProducts = query.Select(x => new ProductValues() {
+                ID = x.id,
+                Name = x.n,
+                Quantity = x.q
+            }).ToList();
+
+            return View(new EditActivityViewModel() {
+                ActivityToAdd = activityToAdd,
+                ListOfProducts = listOfProducts,
+                ActivityProducts = activityProducts
+            });
+        }
+
+        /*[HttpPost]
+        public ViewResult EditActivity();*/
+
         public ViewResult ActivityDetails(int activityId) {
 
             var activity = repository.Activities
@@ -125,25 +153,23 @@ namespace Warehouse.Controllers {
                 .FirstOrDefault();
 
             var products = repository.ProductLines
-                .Where(p => p.ActivityID == activity.ActivityID)
-                .OrderBy(p => p.ActivityID);
+                .Where(p => p.ActivityID == activityId)
+                .OrderBy(p => p.ProductLineID);
+
+            var query = from prod in repository.Products
+                        join productLine in products
+                        on prod.ProductID equals productLine.ProductID
+                        select new { productName = prod.Name, productQuantity = productLine.Quantity };
 
             return View(new ActivityDetailsViewModel() {
                 Activity = activity,
-                Products = products
+                Products = query.Select(x => new ProductAndQuantity {
+                    Product = x.productName,
+                    Quantity = x.productQuantity
+                }).ToList()
             });
         }
 
-        [HttpPost]
-        public ViewResult DeleteProductFromActivity(AddActivityViewModel activity,
-                                                    int activityProductId) {
 
-            activity.ListOfProducts = new SelectList(
-                        repository.Products, "ProductID", "Name");
-
-            activity.ActivityProducts.RemoveAt(activityProductId);
-
-            return View("AddActivity", activity);
-        }
     }
 }

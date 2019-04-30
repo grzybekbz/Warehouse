@@ -11,7 +11,7 @@
 @{
     if (!(Model.Activities.Count() == 0)) {
 
-        <table class="table table-striped table-dark table-bordered table-sm dtable" align="center">
+        <table class="table table-striped table-light table-bordered table-sm dtable" align="center">
             <tr>
                 <th class="text-right">ID</th>
                 <th class="text-center">Data</th>
@@ -42,12 +42,16 @@
                     </td>
                     <td class="text-center">@item.Where</td>
                     <td class="text-center" style="width: 24%">
-                        <form asp-action="ActivityDelete" method="post">
-                            <a asp-action="ActivityDetails" class="btn btn-sm btn-success"
-                               asp-route-activityId="@item.ActivityID">
+                        <div id="result" style="display: none;"></div>
+                        <form asp-action="DeleteActivity" method="post">
+
+                            <a onclick="window.open('@Url.Action("ActivityDetails", "Activity", new { activityId = item.ActivityID })',
+                               'newwindow', 'width=500,height=600'); return false;" class="btn btn-sm btn-success"
+                               href="@Url.Action("ActivityDetails", "Activity", new { activityId = item.ActivityID })">
                                 Szczegóły
                             </a>
-                            <a asp-action="ActivityEdit" class="btn btn-sm btn-warning"
+
+                            <a asp-action="EditActivity" class="btn btn-sm btn-warning"
                                asp-route-activityId="@item.ActivityID">
                                 Edytuj
                             </a>

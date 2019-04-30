@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Warehouse.Models {
 
-    public class AddActivityViewModel {
+    public class EditActivityViewModel {
 
         public Activity ActivityToAdd { get; set; }
 

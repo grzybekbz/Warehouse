@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Warehouse.Models {
@@ -66,6 +67,34 @@ namespace Warehouse.Models {
 
                 context.ProductLines.Add(line);
             }
+
+            context.SaveChanges();
+        }
+
+        public void EditProductsInActivity(List<ProductValues> changedProductsInActivity,
+                                   Activity activity) {
+
+            var actualProductsInActivity = context.ProductLines
+                    .Include(u => u.ActivityID)
+                    .Where(a => a.ActivityID == activity.ActivityID).ToList();
+
+            var newProductsInActivity = new List<ProductLine>();
+
+            var productLineId = actualProductsInActivity.FirstOrDefault().ProductLineID;
+
+            foreach (var product in changedProductsInActivity) {
+
+                ProductLine line = new ProductLine() {
+                    ProductLineID = productLineId,
+                    ActivityID = activity.ActivityID,
+                    ProductID = product.ID,
+                    Quantity = product.Quantity
+                };
+
+                newProductsInActivity.Add(line);
+            }
+
+            actualProductsInActivity = newProductsInActivity;
 
             context.SaveChanges();
         }
