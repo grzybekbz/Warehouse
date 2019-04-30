@@ -13,5 +13,7 @@ namespace Warehouse.Models {
         void SaveActivity(Activity activity);
         void SaveProductsInActivity(List<ProductValues> products,
                                            Activity activity);
-        }
+        void DeleteActivityAndProducts(List<ProductLine> products,
+                                            Activity activity);
+    }
 }

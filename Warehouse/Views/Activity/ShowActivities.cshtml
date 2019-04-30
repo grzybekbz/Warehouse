@@ -43,11 +43,16 @@
                     <td class="text-center">@item.Where</td>
                     <td class="text-center" style="width: 24%">
                         <div id="result" style="display: none;"></div>
-                        <form asp-action="DeleteActivity" method="post">
+                        <form asp-action="DeleteActivity" method="post" 
+                            asp-route-activityId="@item.ActivityID"
+                            asp-route-activityType="@Model.ActivityType">
 
-                            <a onclick="window.open('@Url.Action("ActivityDetails", "Activity", new { activityId = item.ActivityID })',
-                               'newwindow', 'width=500,height=600'); return false;" class="btn btn-sm btn-success"
-                               href="@Url.Action("ActivityDetails", "Activity", new { activityId = item.ActivityID })">
+                            <a onclick="window.open('@Url.Action("ActivityDetails", 
+                                    "Activity", new { activityId = item.ActivityID })',
+                               'newwindow', 'width=500,height=600'); return false;"
+                               class="btn btn-sm btn-success"
+                               href="@Url.Action("ActivityDetails", "Activity",
+                                    new { activityId = item.ActivityID })">
                                 Szczegóły
                             </a>
 

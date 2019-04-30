@@ -128,7 +128,8 @@ namespace Warehouse.Controllers {
                         join productLine in repository.ProductLines
                         on product.ProductID equals productLine.ProductID
                         where productLine.ActivityID == activityId
-                        select new { id = product.ProductID, n = product.Name, q = productLine.Quantity };
+                        select new { id = product.ProductID,
+                            n = product.Name, q = productLine.Quantity };
 
             var activityProducts = query.Select(x => new ProductValues() {
                 ID = x.id,
@@ -143,8 +144,25 @@ namespace Warehouse.Controllers {
             });
         }
 
-        /*[HttpPost]
-        public ViewResult EditActivity();*/
+        public ViewResult DeleteActivity(int activityId,
+                                         string activityType) {
+
+            var activity = repository.Activities
+                    .Where(a => a.ActivityID == activityId)
+                    .FirstOrDefault();
+
+            var products = repository.ProductLines
+                    .Where(p => p.ActivityID == activityId)
+                    .ToList();
+
+            repository.DeleteActivityAndProducts(products, activity);
+
+            return View("ShowActivities", new ShowAcivitiesViewModel() {
+                ActivityType = activityType,
+                Activities = repository.Activities
+            .Where(p => p.Type.Equals(activityType))
+            });
+        }
 
         public ViewResult ActivityDetails(int activityId) {
 
@@ -159,7 +177,8 @@ namespace Warehouse.Controllers {
             var query = from prod in repository.Products
                         join productLine in products
                         on prod.ProductID equals productLine.ProductID
-                        select new { productName = prod.Name, productQuantity = productLine.Quantity };
+                        select new { productName = prod.Name,
+                            productQuantity = productLine.Quantity };
 
             return View(new ActivityDetailsViewModel() {
                 Activity = activity,
